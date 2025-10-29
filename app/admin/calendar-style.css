@@ -1,0 +1,38 @@
+.calendar-grid {
+  display: grid;
+  grid-template-columns: 120px repeat(30, minmax(50px, 1fr));
+  grid-auto-rows: 50px;
+}
+
+.grid-cell {
+  @apply border-r border-b border-gray-200 dark:border-gray-700 flex flex-col justify-center p-2;
+}
+
+.header-cell {
+  @apply bg-gray-50 dark:bg-gray-800 text-xs;
+}
+
+.room-cell {
+  @apply bg-white dark:bg-gray-800/50;
+}
+
+.booking-bar {
+  @apply text-white text-xs font-semibold p-1 rounded-md overflow-hidden flex items-center h-[calc(100%-8px)] m-1 cursor-pointer;
+  z-index: 5;
+}
+
+.status-booked {
+  @apply bg-blue-500;
+}
+.status-available {
+  @apply bg-green-500;
+}
+.status-blocked {
+  @apply bg-red-500;
+}
+.status-cleaning {
+  @apply bg-yellow-500;
+}
+.status-company {
+  @apply bg-teal-500;
+}

@@ -1,0 +1,494 @@
+{
+  "entities": {
+    "CityBreak": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CityBreak",
+      "type": "object",
+      "description": "Represents a city break package offered by the travel agency.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the city break."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the city break package."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the city break."
+        },
+        "location": {
+          "type": "string",
+          "description": "The city where the break takes place."
+        },
+        "duration": {
+          "type": "string",
+          "description": "Duration of the city break (e.g., '3 days/2 nights')."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the city break package."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the image representing the city break."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "location",
+        "duration",
+        "price",
+        "imageUrl"
+      ]
+    },
+    "Tour": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Tour",
+      "type": "object",
+      "description": "Represents a tour package offered by the travel agency.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the tour."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the tour."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the tour."
+        },
+        "destination": {
+          "type": "string",
+          "description": "The destination of the tour."
+        },
+        "duration": {
+          "type": "string",
+          "description": "Duration of the tour (e.g., '7 days')."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the tour package."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the image representing the tour."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "destination",
+        "duration",
+        "price",
+        "imageUrl"
+      ]
+    },
+    "CoachRide": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CoachRide",
+      "type": "object",
+      "description": "Represents a coach ride service offered by the travel agency.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the coach ride."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the coach ride route."
+        },
+        "departure": {
+          "type": "string",
+          "description": "Departure location for the coach ride."
+        },
+        "arrival": {
+          "type": "string",
+          "description": "Arrival location for the coach ride."
+        },
+        "departureTime": {
+          "type": "string",
+          "description": "Departure time of the coach ride."
+        },
+        "arrivalTime": {
+          "type": "string",
+          "description": "Arrival time of the coach ride."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the coach ride."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "departure",
+        "arrival",
+        "departureTime",
+        "arrivalTime",
+        "price"
+      ]
+    },
+    "Hotel": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Hotel",
+      "type": "object",
+      "description": "Represents a hotel offered through the travel agency.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the hotel."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the hotel."
+        },
+        "location": {
+          "type": "string",
+          "description": "Location of the hotel."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the hotel and its amenities."
+        },
+        "pricePerNight": {
+          "type": "number",
+          "description": "Price per night for a standard room."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the image representing the hotel."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "location",
+        "description",
+        "pricePerNight",
+        "imageUrl"
+      ]
+    },
+    "Flight": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Flight",
+      "type": "object",
+      "description": "Represents a flight offered by the travel agency.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the flight."
+        },
+        "airline": {
+          "type": "string",
+          "description": "Name of the airline."
+        },
+        "departureAirport": {
+          "type": "string",
+          "description": "Departure airport code (e.g., 'JFK')."
+        },
+        "arrivalAirport": {
+          "type": "string",
+          "description": "Arrival airport code (e.g., 'LAX')."
+        },
+        "departureTime": {
+          "type": "string",
+          "description": "Departure time of the flight."
+        },
+        "arrivalTime": {
+          "type": "string",
+          "description": "Arrival time of the flight."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the flight."
+        }
+      },
+      "required": [
+        "id",
+        "airline",
+        "departureAirport",
+        "arrivalAirport",
+        "departureTime",
+        "arrivalTime",
+        "price"
+      ]
+    },
+    "Booking": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Booking",
+      "type": "object",
+      "description": "Represents a booking made by a user for a travel service.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the booking."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who made the booking. (Relationship: User 1:N Booking)"
+        },
+        "serviceType": {
+          "type": "string",
+          "description": "Type of service booked (e.g., 'CityBreak', 'Tour', 'Hotel', 'Flight', 'CoachRide')."
+        },
+        "serviceId": {
+          "type": "string",
+          "description": "Reference to the specific service booked (e.g., the ID of the CityBreak, Tour, etc.)."
+        },
+        "bookingDate": {
+          "type": "string",
+          "description": "Date the booking was made.",
+          "format": "date-time"
+        },
+        "travelDate": {
+          "type": "string",
+          "description": "The date for which the service is booked.",
+          "format": "date-time"
+        },
+        "numberOfTravelers": {
+          "type": "number",
+          "description": "Number of travelers for the booking."
+        },
+        "totalPrice": {
+          "type": "number",
+          "description": "Total price of the booking."
+        },
+        "paymentStatus": {
+          "type": "string",
+          "description": "Payment status of the booking (e.g., 'pending', 'completed', 'failed')."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "serviceType",
+        "serviceId",
+        "bookingDate",
+        "travelDate",
+        "numberOfTravelers",
+        "totalPrice",
+        "paymentStatus"
+      ]
+    },
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the travel agency website, who can be a client or staff.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number of the user."
+        },
+        "address": {
+          "type": "string",
+          "description": "Address of the user."
+        },
+        "role": {
+          "type": "string",
+          "description": "The role of the user within the system.",
+          "enum": ["Admin", "Staff", "User"]
+        },
+        "isAdmin": {
+          "type": "boolean",
+          "description": "Indicates whether the user has admin privileges."
+        },
+        "propertyAccess": {
+            "type": "array",
+            "description": "List of property IDs the staff member has access to.",
+            "items": {
+                "type": "string"
+            }
+        },
+        "permissions": {
+            "type": "object",
+            "description": "Feature-based permissions for the staff member.",
+            "properties": {
+                "bookings": {
+                    "type": "array",
+                    "items": {"type": "string", "enum": ["view", "edit", "delete"]}
+                },
+                "rooms": {
+                    "type": "array",
+                    "items": {"type": "string", "enum": ["view", "edit", "delete"]}
+                }
+            }
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "email",
+        "role"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/cityBreaks/{cityBreakId}",
+        "definition": {
+          "entityName": "CityBreak",
+          "schema": {
+            "$ref": "#/backend/entities/CityBreak"
+          },
+          "description": "Collection of city break packages offered by the travel agency.",
+          "params": [
+            {
+              "name": "cityBreakId",
+              "description": "Unique identifier for the city break."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/tours/{tourId}",
+        "definition": {
+          "entityName": "Tour",
+          "schema": {
+            "$ref": "#/backend/entities/Tour"
+          },
+          "description": "Collection of tour packages offered by the travel agency.",
+          "params": [
+            {
+              "name": "tourId",
+              "description": "Unique identifier for the tour."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/coachRides/{coachRideId}",
+        "definition": {
+          "entityName": "CoachRide",
+          "schema": {
+            "$ref": "#/backend/entities/CoachRide"
+          },
+          "description": "Collection of coach ride services offered by the travel agency.",
+          "params": [
+            {
+              "name": "coachRideId",
+              "description": "Unique identifier for the coach ride."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/hotels/{hotelId}",
+        "definition": {
+          "entityName": "Hotel",
+          "schema": {
+            "$ref": "#/backend/entities/Hotel"
+          },
+          "description": "Collection of hotels offered through the travel agency.",
+          "params": [
+            {
+              "name": "hotelId",
+              "description": "Unique identifier for the hotel."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/flights/{flightId}",
+        "definition": {
+          "entityName": "Flight",
+          "schema": {
+            "$ref": "#/backend/entities/Flight"
+          },
+          "description": "Collection of flights offered by the travel agency.",
+          "params": [
+            {
+              "name": "flightId",
+              "description": "Unique identifier for the flight."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Collection of user profiles. Used for storing user information for clients and staff.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "Unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/bookings/{bookingId}",
+        "definition": {
+          "entityName": "Booking",
+          "schema": {
+            "$ref": "#/backend/entities/Booking"
+          },
+          "description": "Subcollection of bookings for each user. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "Unique identifier for the user."
+            },
+            {
+              "name": "bookingId",
+              "description": "Unique identifier for the booking."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "roles_admin",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Collection of admin roles. Existence of a document indicates admin privileges.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "Unique identifier for the user."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to be secure, scalable, and easily debuggable, following the core design principles and strategy mandates. Authorization Independence is achieved through denormalization, primarily within the `bookings` collection where the `userId` is stored directly in each booking document, eliminating the need for `get()` calls to the `users` collection to authorize access to bookings. Structural Segregation is applied by storing different data types in separate collections (e.g., `cityBreaks`, `tours`, `coachRides`, `hotels`, `flights`, `bookings`, and `roles_admin`), each with homogeneous security requirements. Access Modeling is based on path-based ownership for user-related data (`/users/{userId}/bookings/{bookingId}`) and a dedicated collection (`/roles_admin/{uid}`) for global admin roles, checked for existence rather than content, simplifying security rules. QAPs (Rules are not Filters) are supported by segregating data into collections that align with different access control needs (e.g., public service listings and private user bookings). Explicit State Modeling and predictable schema are encouraged, with all objects conforming to their JSON schema definitions. This design pattern will enable secure list operations, integrity of data, and proper assignment of ownership. Admin accounts are managed via the `roles_admin` collection."
+  }
+}

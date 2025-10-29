@@ -1,0 +1,149 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  Admin
+  Staff
+  User
+  SuperAdmin
+}
+
+enum ServiceCategory {
+  CityBreak
+  Tour
+  Hotel
+  Flight
+  CoachRide
+}
+
+enum ServiceStatus {
+  Active
+  Inactive
+}
+
+// Status for support threads
+enum SupportStatus {
+  Open
+  InProgress
+  Pending
+  Resolved
+  Urgent
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  name         String?
+  phone        String?
+  address      String?
+  role         Role     @default(User)
+  passwordHash String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  bookings     Booking[]
+}
+
+model Service {
+  id          String          @id @default(cuid())
+  category    ServiceCategory
+  title       String
+  description String
+  price       Float
+  offerPrice  Float?
+  location    String
+  imageUrl    String          @db.Text
+  createdAt   DateTime        @default(now())
+
+  // Operations/CRUD enhancements
+  status      ServiceStatus   @default(Active)
+  available   Boolean         @default(true)
+  startDate   DateTime?
+  endDate     DateTime?
+  isOffer     Boolean         @default(false)
+
+  bookings    Booking[]
+}
+
+model Booking {
+  id                 String   @id @default(cuid())
+  userId             Int
+  user               User     @relation(fields: [userId], references: [id])
+  serviceId          String
+  service            Service  @relation(fields: [serviceId], references: [id])
+  bookingDate        DateTime
+  travelDate         DateTime
+  numberOfTravelers  Int
+  totalPrice         Float
+  paymentStatus      String
+  status             String   @default("Pending")
+  createdAt          DateTime @default(now())
+}
+
+// Global website settings for dynamic configuration
+model SiteSettings {
+  id             String   @id @default(cuid())
+  siteTitle      String   @default("VoyagerHub")
+  domains        Json?
+  logoUrl        String?
+  faviconUrl     String?
+  footer         Json?    // {contactEmail, contactPhone, address, disclaimer, social:{twitter,facebook,instagram,linkedin,youtube}}
+  navigation     Json?    // [{label, href, visible}]
+  sections       Json?    // [{name, href, visible}]
+  theme          Json?    // {primaryColor, secondaryColor, fontFamily}
+  seoTitle       String?
+  seoDescription String?
+  seoKeywords    String?
+  version        Int      @default(1)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  histories      SiteSettingsHistory[]
+}
+
+// History snapshots of settings for optional restore/versioning
+model SiteSettingsHistory {
+  id         String       @id @default(cuid())
+  settingsId String
+  settings   SiteSettings @relation(fields: [settingsId], references: [id])
+  version    Int
+  data       Json
+  createdAt  DateTime     @default(now())
+}
+
+// Conversation threads for Help & Support
+model SupportThread {
+  id               String        @id @default(cuid())
+  userId           Int
+  user             User          @relation(fields: [userId], references: [id])
+  assignedAdminId  Int?
+  assignedAdmin    User?         @relation(fields: [assignedAdminId], references: [id])
+  subject          String?
+  status           SupportStatus @default(Open)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  messages         SupportMessage[]
+}
+
+// Individual messages in a support thread
+model SupportMessage {
+  id           String        @id @default(cuid())
+  threadId     String
+  thread       SupportThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  adminId      Int?
+  admin        User?         @relation(fields: [adminId], references: [id])
+  userId       Int?
+  user         User?         @relation(fields: [userId], references: [id])
+  messageText  String        @db.Text
+  attachments  Json?
+  readByUser   Boolean       @default(false)
+  readByAdmin  Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+}
