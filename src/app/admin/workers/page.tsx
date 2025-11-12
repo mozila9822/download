@@ -60,6 +60,7 @@ export default function WorkersPage() {
   const [workers, setWorkers] = useState<any[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const [filterMode, setFilterMode] = useState<'Staff' | 'All'>('Staff');
 
   const [selected, setSelected] = useState<any | null>(null);
   const [viewOpen, setViewOpen] = useState(false);
@@ -77,7 +78,10 @@ export default function WorkersPage() {
     async function load() {
       try {
         setIsLoading(true);
-        const res = await fetch('/api/users', { cache: 'no-store' });
+        const url = filterMode === 'Staff'
+          ? '/api/users?role=Admin,Staff,SuperAdmin'
+          : '/api/users';
+        const res = await fetch(url, { cache: 'no-store' });
         if (!res.ok) throw new Error(`Failed to fetch workers: ${res.status}`);
         const data = await res.json();
         if (!cancelled) setWorkers(data);
@@ -90,7 +94,7 @@ export default function WorkersPage() {
     }
     load();
     return () => { cancelled = true; };
-  }, []);
+  }, [filterMode]);
 
   function onView(worker: any) {
     setSelected(worker);
@@ -170,11 +174,22 @@ export default function WorkersPage() {
             Manage all worker and staff information.
           </CardDescription>
         </div>
-        <Button asChild>
-          <Link href="/admin/workers/add">
-            <Plus className="mr-2" /> Add Staff
-          </Link>
-        </Button>
+        <div className="flex items-center gap-3">
+          <Select value={filterMode} onValueChange={(v: any) => setFilterMode(v)}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Filter" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Staff">Staff only</SelectItem>
+              <SelectItem value="All">All users</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button asChild>
+            <Link href="/admin/workers/add">
+              <Plus className="mr-2" /> Add Staff
+            </Link>
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
          <Table>
@@ -200,7 +215,7 @@ export default function WorkersPage() {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar>
-                          <AvatarImage src={`https://i.pravatar.cc/40?u=${worker.id}`} />
+                          <AvatarImage src={`https://picsum.photos/seed/worker-${worker.id}/40/40`} />
                           <AvatarFallback>{worker.firstName?.charAt(0)}{worker.lastName?.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div>

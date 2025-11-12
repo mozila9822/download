@@ -31,7 +31,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import '../calendar-style.css';
+// Global calendar styles are imported in the admin layout to comply with Next.js rules
 
 const dashboardStats = [
   {

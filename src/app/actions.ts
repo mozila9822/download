@@ -2,7 +2,9 @@
 
 import { personalizedItinerarySuggestions } from '@/ai/flows/personalized-itinerary-suggestions';
 import { z } from 'zod';
-import { prisma } from '@/lib/db';
+import { prisma, prismaOrNull } from '@/lib/db';
+import mysql from 'mysql2/promise';
+import bcrypt from 'bcryptjs';
 
 const ItinerarySchema = z.object({
   preferences: z.string().min(10, 'Please describe your preferences in more detail.'),
@@ -102,19 +104,70 @@ export async function createWorker(prevState: WorkerState, formData: FormData) :
     const [firstName, lastName] = fullName.split(' ');
 
     try {
-        if (!prisma) {
-            return {
-                message: 'Database not configured. Please set DATABASE_URL.',
-                errors: null,
+        const db = await prismaOrNull();
+        if (db) {
+            try {
+                await db.user.create({
+                    data: {
+                        email,
+                        name: fullName,
+                        role: role as any,
+                    },
+                });
+            } catch (err: any) {
+                const isUniqueEmail = err && err.code === 'P2002' && (
+                  (Array.isArray(err.meta?.target) && err.meta?.target.includes('email')) ||
+                  String(err.meta?.target || '').includes('email')
+                )
+                if (isUniqueEmail) {
+                    return {
+                        message: 'Email already registered. Please use a different email.',
+                        errors: { email: ['Email already registered'] },
+                    }
+                }
+                throw err
+            }
+        } else {
+            // Direct MySQL fallback when Prisma engine is unavailable
+            const host = process.env.MYSQL_HOST
+            const userEnv = process.env.MYSQL_USER
+            const passwordEnv = process.env.MYSQL_PASSWORD
+            const database = process.env.MYSQL_DATABASE
+            const port = Number(process.env.MYSQL_PORT || 3306)
+            if (!host || !userEnv || !passwordEnv || !database) {
+                return {
+                    message: 'Database unreachable. Please configure MYSQL_* envs or try again shortly.',
+                    errors: null,
+                }
+            }
+            let conn: mysql.Connection | null = null
+            try {
+                conn = await mysql.createConnection({ host, user: userEnv, password: passwordEnv, database, port })
+                const normalizedEmail = email.trim().toLowerCase()
+                const [existingRows] = await conn.query<any[]>('SELECT id FROM `User` WHERE email = ? LIMIT 1', [normalizedEmail])
+                if (Array.isArray(existingRows) && existingRows.length) {
+                    return {
+                        message: 'Email already registered. Please use a different email.',
+                        errors: { email: ['Email already registered'] },
+                    }
+                }
+                await conn.execute<any>(
+                  'INSERT INTO `User` (email, name, role, createdAt, updatedAt) VALUES (?, ?, ?, NOW(), NOW())',
+                  [normalizedEmail, fullName, role]
+                )
+            } catch (err: any) {
+                const msg = err?.message || String(err)
+                if (msg.includes('ER_DUP_ENTRY')) {
+                    return {
+                        message: 'Email already registered. Please use a different email.',
+                        errors: { email: ['Email already registered'] },
+                    }
+                }
+                throw err
+            } finally {
+                if (conn) await conn.end().catch(() => {})
             }
         }
-        await prisma.user.create({
-            data: {
-                email,
-                name: fullName,
-                role: role as any,
-            },
-        });
         return {
             message: 'Worker created successfully!',
             errors: null,

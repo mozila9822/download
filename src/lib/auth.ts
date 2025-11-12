@@ -11,12 +11,18 @@ type SessionPayload = JWTPayload & {
 }
 
 function getJwtSecret(): Uint8Array {
-  const secret = process.env.JWT_SECRET || ''
-  if (!secret || secret.length < 32) {
-    // Intentionally avoid logging value; guide developers via error message.
-    throw new Error('JWT_SECRET must be set and at least 32 characters long')
+  const configured = process.env.JWT_SECRET || ''
+  if (configured && configured.length >= 32) {
+    return new TextEncoder().encode(configured)
   }
-  return new TextEncoder().encode(secret)
+  // Provide a safe developer fallback only in non-production envs.
+  // This avoids blocking local sign-in while keeping production strict.
+  if (process.env.NODE_ENV !== 'production') {
+    const devDefault = 'vh-dev-secret-do-not-use-in-prod-0123456789abcdef012345'
+    return new TextEncoder().encode(devDefault)
+  }
+  // Intentionally avoid logging secret values; guide via error message.
+  throw new Error('JWT_SECRET must be set and at least 32 characters long')
 }
 
 export async function signSessionToken(payload: SessionPayload, expiresInSeconds = SESSION_MAX_AGE_SECONDS): Promise<string> {
@@ -62,4 +68,3 @@ export function buildCookieOptions(token: string) {
 export function canAccessAdmin(role: SessionPayload['role']): boolean {
   return role === 'master_admin' || role === 'Admin' || role === 'Staff' || role === 'SuperAdmin'
 }
-

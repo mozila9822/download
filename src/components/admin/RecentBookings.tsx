@@ -59,7 +59,7 @@ export default function RecentBookings({ bookings }: RecentBookingsProps) {
                   </div>
                 </TableCell>
                 <TableCell className="text-right">
-                  ${booking.amount.toFixed(2)}
+                  £{booking.amount.toFixed(2)}
                 </TableCell>
                 <TableCell className="text-right">
                    <Badge 

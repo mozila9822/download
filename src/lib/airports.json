@@ -1,0 +1,33 @@
+{
+  "airports": [
+    { "code": "ATL", "name": "Hartsfield–Jackson Atlanta International", "city": "Atlanta", "country": "US", "type": "airport" },
+    { "code": "PEK", "name": "Beijing Capital International", "city": "Beijing", "country": "CN", "type": "airport" },
+    { "code": "LAX", "name": "Los Angeles International", "city": "Los Angeles", "country": "US", "type": "airport" },
+    { "code": "DXB", "name": "Dubai International", "city": "Dubai", "country": "AE", "type": "airport" },
+    { "code": "HND", "name": "Tokyo Haneda", "city": "Tokyo", "country": "JP", "type": "airport" },
+    { "code": "ORD", "name": "Chicago O’Hare", "city": "Chicago", "country": "US", "type": "airport" },
+    { "code": "LHR", "name": "London Heathrow", "city": "London", "country": "GB", "type": "airport" },
+    { "code": "PVG", "name": "Shanghai Pudong", "city": "Shanghai", "country": "CN", "type": "airport" },
+    { "code": "CDG", "name": "Paris Charles de Gaulle", "city": "Paris", "country": "FR", "type": "airport" },
+    { "code": "DFW", "name": "Dallas/Fort Worth International", "city": "Dallas–Fort Worth", "country": "US", "type": "airport" },
+    { "code": "CAN", "name": "Guangzhou Baiyun", "city": "Guangzhou", "country": "CN", "type": "airport" },
+    { "code": "AMS", "name": "Amsterdam Schiphol", "city": "Amsterdam", "country": "NL", "type": "airport" },
+    { "code": "FRA", "name": "Frankfurt Airport", "city": "Frankfurt", "country": "DE", "type": "airport" },
+    { "code": "IST", "name": "Istanbul Airport", "city": "Istanbul", "country": "TR", "type": "airport" },
+    { "code": "SIN", "name": "Singapore Changi", "city": "Singapore", "country": "SG", "type": "airport" },
+    { "code": "SYD", "name": "Sydney Kingsford Smith", "city": "Sydney", "country": "AU", "type": "airport" },
+    { "code": "GRU", "name": "São Paulo–Guarulhos", "city": "São Paulo", "country": "BR", "type": "airport" },
+    { "code": "YYZ", "name": "Toronto Pearson", "city": "Toronto", "country": "CA", "type": "airport" },
+    { "code": "JFK", "name": "John F. Kennedy International", "city": "New York", "country": "US", "type": "airport" },
+    { "code": "SFO", "name": "San Francisco International", "city": "San Francisco", "country": "US", "type": "airport" },
+    { "code": "NBO", "name": "Jomo Kenyatta International", "city": "Nairobi", "country": "KE", "type": "airport" },
+    { "code": "CMN", "name": "Casablanca Mohammed V", "city": "Casablanca", "country": "MA", "type": "airport" },
+    { "code": "JNB", "name": "O. R. Tambo International", "city": "Johannesburg", "country": "ZA", "type": "airport" },
+    { "code": "DEL", "name": "Delhi Indira Gandhi", "city": "New Delhi", "country": "IN", "type": "airport" },
+    { "code": "BOM", "name": "Mumbai Chhatrapati Shivaji Maharaj", "city": "Mumbai", "country": "IN", "type": "airport" },
+    { "code": "ICN", "name": "Seoul Incheon", "city": "Seoul", "country": "KR", "type": "airport" },
+    { "code": "MEX", "name": "Mexico City International", "city": "Mexico City", "country": "MX", "type": "airport" },
+    { "code": "MAD", "name": "Madrid Barajas", "city": "Madrid", "country": "ES", "type": "airport" },
+    { "code": "BCN", "name": "Barcelona–El Prat", "city": "Barcelona", "country": "ES", "type": "airport" }
+  ]
+}

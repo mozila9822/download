@@ -19,6 +19,7 @@ export type Booking = {
   numberOfTravelers: number;
   totalPrice: number;
   paymentStatus: string;
+  extras?: any;
 };
 
 export type AdminStat = {

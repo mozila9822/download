@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/select';
 import { properties } from '@/lib/data';
 import StatCard from '@/components/admin/StatCard';
-import { DollarSign, BedDouble, Users, Percent } from 'lucide-react';
+import { PoundSterling, BedDouble, Users, Percent } from 'lucide-react';
 import BookingChart from '@/components/admin/BookingChart';
 import OccupancyChart from '@/components/admin/OccupancyChart';
 
@@ -26,10 +26,10 @@ import OccupancyChart from '@/components/admin/OccupancyChart';
 const reportStats = [
     {
         title: "Total Revenue",
-        value: "$125,430",
+        value: "£125,430",
         change: "+15.2% vs last period",
         changeType: 'increase' as const,
-        icon: DollarSign
+        icon: PoundSterling
     },
     {
         title: "Avg. Occupancy",

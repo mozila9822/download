@@ -83,6 +83,22 @@ service cloud.firestore {
     }
 
     /**
+     * @description Grants public read access to city breaks. Only admins can create, update, or delete.
+     * @path /cityBreaks/{cityBreakId}
+     * @allow get, list: if true;
+     * @allow create: if isAdmin();
+     * @allow update: if isAdmin();
+     * @allow delete: if isAdmin();
+     * @principle Public read, admin-only writes.
+     */
+    match /cityBreaks/{cityBreakId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    /**
      * @description Grants access to user profiles only to the user themselves.
      * @path /users/{userId}
      * @allow get: if isOwner(userId);

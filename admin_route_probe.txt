@@ -1,0 +1,13 @@
+﻿Login status: 200, cookies: 1
+/admin/dashboard -> 200
+/admin/bookings -> 200
+/admin/calendar -> 200
+/admin/rooms -> 200
+/admin/clients -> 200
+/admin/city-breaks -> 200
+/admin/workers -> 200
+/admin/reports -> 200
+/admin/operations -> 200
+/admin/settings -> 200
+/admin/db-status -> 200
+/admin/support -> 200

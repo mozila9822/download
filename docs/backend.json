@@ -263,6 +263,11 @@
         "paymentStatus": {
           "type": "string",
           "description": "Payment status of the booking (e.g., 'pending', 'completed', 'failed')."
+        },
+        "extras": {
+          "type": "object",
+          "description": "Additional category-specific details captured from the Book page.",
+          "additionalProperties": true
         }
       },
       "required": [

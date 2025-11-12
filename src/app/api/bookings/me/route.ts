@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { prismaOrNull } from '@/lib/db'
 import { SESSION_COOKIE_NAME, verifySessionToken } from '@/lib/auth'
 
 type MyBookingRow = {
@@ -22,20 +22,20 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
     }
 
-    const isDbConfigured = !!process.env.DATABASE_URL && process.env.DATABASE_URL.trim().length > 0
-    if (!isDbConfigured || !prisma) {
+    const db = await prismaOrNull()
+    if (!db) {
       // In development without DB, do not leak fallback/global bookings.
       // Return an empty list for normal users to avoid confusion.
       return NextResponse.json([] satisfies MyBookingRow[])
     }
 
-    const user = await prisma.user.findUnique({ where: { email: session.email } })
+    const user = await db.user.findUnique({ where: { email: session.email } })
     if (!user) {
       // If the session exists but there is no DB user yet, return empty.
       return NextResponse.json([] satisfies MyBookingRow[])
     }
 
-    const rows = await prisma.booking.findMany({
+    const rows = await db.booking.findMany({
       where: { userId: Number(user.id as any) },
       orderBy: { createdAt: 'desc' },
       include: { service: true },
@@ -55,4 +55,3 @@ export async function GET(req: NextRequest) {
     return new Response('Internal Server Error', { status: 500 })
   }
 }
-

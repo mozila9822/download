@@ -35,6 +35,7 @@ export default function ProfilePage() {
   const photoURL = "";
   const [bookings, setBookings] = useState<MyBookingRow[]>([]);
   const [bookingsLoading, setBookingsLoading] = useState<boolean>(true);
+  const [payingId, setPayingId] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -118,6 +119,44 @@ export default function ProfilePage() {
     }
   }
 
+  async function reloadBookings() {
+    try {
+      setBookingsLoading(true);
+      const res = await fetch("/api/bookings/me", { cache: "no-store" });
+      const data = await res.json();
+      setBookings(Array.isArray(data) ? data : []);
+    } catch {
+      setBookings([]);
+    } finally {
+      setBookingsLoading(false);
+    }
+  }
+
+  async function handlePayNow(bookingId: string) {
+    try {
+      setPayingId(bookingId);
+      const res = await fetch("/api/payments/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data?.error || `Payment failed (${res.status})`);
+      }
+      if (data.provider === "stripe" && data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+        return;
+      }
+      toast({ title: "Payment successful", description: "Your booking is confirmed." });
+      await reloadBookings();
+    } catch (e: any) {
+      toast({ title: "Payment error", description: e?.message || "Unable to process payment.", variant: "destructive" as any });
+    } finally {
+      setPayingId(null);
+    }
+  }
+
   return (
     <SiteLayout>
       <div className="container py-12 md:py-16">
@@ -167,6 +206,7 @@ export default function ProfilePage() {
                         <TableHead>Date</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead className="text-right">Total</TableHead>
+                        <TableHead className="text-right">Action</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -190,7 +230,16 @@ export default function ProfilePage() {
                             </Badge>
                           </TableCell>
                           <TableCell className="text-right">
-                            ${booking.totalPrice?.toFixed(2)}
+                            £{booking.totalPrice?.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {!["paid", "completed", "success"].includes(String(booking.paymentStatus).toLowerCase()) ? (
+                              <Button size="sm" disabled={payingId === booking.id} onClick={() => handlePayNow(booking.id)}>
+                                {payingId === booking.id ? "Processing…" : "Pay Now"}
+                              </Button>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">—</span>
+                            )}
                           </TableCell>
                         </TableRow>
                       ))}

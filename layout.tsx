@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Toaster } from '@/components/ui/toaster';
+import ThemeVars from '@/components/site/ThemeVars';
 import './globals.css';
 import { cn } from '@/lib/utils';
 // Firebase removed: provider no longer used
@@ -29,8 +30,11 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={cn('font-body antialiased')}>
-        {children}
+      <body className={cn('font-body antialiased min-h-screen bg-background text-foreground')}>
+        <ThemeVars />
+        <div className="flex flex-col min-h-screen">
+          {children}
+        </div>
         <Toaster />
       </body>
     </html>

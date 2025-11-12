@@ -1,10 +1,13 @@
 "use client";
 import SiteLayout from "@/components/site/SiteLayout";
+import { HeroBanner } from "@/components/site/CityBreakTheme";
 import ServiceCard from "@/components/site/ServiceCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type { Service } from "@/lib/types";
+import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
 
 const categories = [
   'All',
@@ -89,18 +92,32 @@ export default function ServicesPage() {
 
   return (
     <SiteLayout>
-      <div className="container py-12 md:py-16">
-        <div className="text-center">
-          <h1 className="text-4xl md:text-5xl font-headline font-bold">
-            Explore Our Services
-          </h1>
-          <p className="mt-4 max-w-2xl mx-auto text-muted-foreground md:text-lg">
-            From relaxing city breaks to adventurous tours, we have something
-            for every traveler.
-          </p>
-        </div>
+      {/* Full-bleed City Break-style Hero */}
+      <HeroBanner
+        title="Explore Our Services"
+        subtitle="From relaxing city breaks to adventurous tours, there’s something for every traveler."
+        imageUrl="https://picsum.photos/seed/services-hero/2400/1200"
+        primaryLink={{ href: "#categories", label: "Browse Categories" }}
+        secondaryLink={{ href: "/offers", label: "See Last Offers" }}
+        heightClass="h-[60vh] md:h-[70vh] lg:h-[75vh]"
+        fullBleed
+        offsetHeader
+        icon={
+          <motion.div
+            initial={{ rotate: -6, y: 0, scale: 1 }}
+            animate={{ rotate: [-6, 6, -6], y: [0, -3, 0, 2, -1, 0], scale: [1, 1.06, 1.0, 1.03, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="relative"
+            aria-hidden
+          >
+            <Sparkles className="h-8 w-8 text-white drop-shadow" />
+          </motion.div>
+        }
+      />
 
-        <Tabs value={tab} onValueChange={setTab} className="mt-12">
+      <div className="container py-12 md:py-16">
+        
+        <Tabs id="categories" value={tab} onValueChange={setTab} className="mt-12">
           <div className="flex justify-center">
             <TabsList className="grid w-full max-w-2xl grid-cols-3 md:grid-cols-6">
               {categories.map((category) => (

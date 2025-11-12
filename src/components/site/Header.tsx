@@ -1,35 +1,25 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { PlaneTakeoff, Menu } from 'lucide-react';
-
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetClose,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSettings } from '@/hooks/use-settings'
 import { useEffect, useState } from 'react';
-// Firebase removed: no auth-dependent UI
 
 function useNav() {
   const { settings } = useSettings()
-  const serviceCategories = (settings?.sections ?? []).filter((s) => s.visible)
   const navLinks = (settings?.navigation ?? []).filter((n) => n.visible)
   const title = settings?.siteTitle || 'VoyagerHub'
   const logoUrl = settings?.logoUrl || null
-  return { serviceCategories, navLinks, title, logoUrl }
+  return { navLinks, title, logoUrl }
 }
 
 export default function Header() {
   const isMobile = useIsMobile();
-  const pathname = usePathname();
-  const isAuthPage = pathname?.startsWith('/auth');
-  const { serviceCategories, navLinks, title, logoUrl } = useNav()
+  const { navLinks, title, logoUrl } = useNav()
   const [auth, setAuth] = useState<{ email: string; role: string; isAdmin: boolean } | null>(null);
 
   useEffect(() => {
@@ -64,118 +54,97 @@ export default function Header() {
   };
 
   return (
-    <header className={isAuthPage ? "relative z-50 w-full bg-background" : "sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"}>
-      <div className="container flex h-16 items-center">
-        <Link href="/" className="mr-6 flex items-center space-x-2">
+    <header className="fixed top-0 left-0 right-0 z-30 w-full bg-gradient-to-b from-black/60 via-black/30 to-transparent backdrop-blur border-b border-white/10">
+      <div className="container flex items-center justify-between px-4 py-3">
+        <Link href="/" className="mr-2 flex items-center space-x-2 text-white">
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={logoUrl} alt={title} className="h-6 w-6 object-contain" />
           ) : (
-            <PlaneTakeoff className="h-6 w-6 text-primary" />
+            <PlaneTakeoff className="h-6 w-6 text-white" />
           )}
-          <span className="font-bold font-headline text-lg">{title}</span>
+          <span className="font-bold font-headline text-lg text-white">{title}</span>
         </Link>
         <div className="flex-1">
           {!isMobile && (
-            <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-              {serviceCategories.map(({ href, name }) => (
-                <Link
-                  key={href + name}
-                  href={href}
-                  className="transition-colors hover:text-primary"
-                >
-                  {name}
-                </Link>
-              ))}
-
-              {navLinks.map(({ href, label }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className="transition-colors hover:text-primary"
-                >
-                  {label}
-                </Link>
+            <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
+              {navLinks.map(({ href, label }, j) => (
+                <motion.div key={href} initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * j }}>
+                  <Link href={href} className="px-3 py-1 rounded-md transition-colors text-white hover:bg-white/10">
+                    {label}
+                  </Link>
+                </motion.div>
               ))}
             </nav>
           )}
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-3">
+          <Link href="/book" className="hidden md:inline-flex">
+            <Button size="sm" className="font-bold">Book Now</Button>
+          </Link>
           {!auth && (
             <>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/auth/signin">Sign In</Link>
-              </Button>
-              <Button size="sm" asChild>
-                <Link href="/auth/signup">Sign Up</Link>
-              </Button>
+              <Link href="/auth/signin" className="transition-colors text-white hover:underline">Sign In</Link>
+              <Link href="/auth/signup" className="transition-colors text-white hover:underline">Sign Up</Link>
             </>
           )}
           {auth && (
             <>
               {auth.isAdmin && (
-                <Button variant="outline" size="sm" asChild>
-                  <Link href="/admin/workers">Admin</Link>
-                </Button>
+                <Link href="/admin/workers" className="transition-colors text-white hover:underline">Admin</Link>
               )}
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/profile">Profile</Link>
-              </Button>
-              <Button size="sm" onClick={signOut}>Sign Out</Button>
+              <Link href="/profile" className="transition-colors text-white hover:underline">Profile</Link>
+              <button onClick={signOut} className="transition-colors text-white hover:underline">Sign Out</button>
             </>
           )}
 
           {isMobile && (
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon">
+                <Button variant="outline" size="icon" className="border-white text-white hover:bg-white/10">
                   <Menu className="h-5 w-5" />
                   <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right">
+              <SheetContent side="right" className="bg-black/50 text-white backdrop-blur-md border-0">
                 <div className="flex flex-col space-y-4">
-                  <Link href="/" className="mr-6 flex items-center space-x-2">
+                  <Link href="/" className="mr-6 flex items-center space-x-2 text-white">
                     {logoUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={logoUrl} alt={title} className="h-6 w-6 object-contain" />
                     ) : (
-                      <PlaneTakeoff className="h-6 w-6 text-primary" />
+                      <PlaneTakeoff className="h-6 w-6 text-white" />
                     )}
-                    <span className="font-bold font-headline text-lg">{title}</span>
+                    <span className="font-bold font-headline text-lg text-white">{title}</span>
                   </Link>
                   <nav className="flex flex-col space-y-2">
-                     <p className="px-3 py-2 text-sm font-semibold">Services</p>
-                    {serviceCategories.map(({ href, name }) => (
-                       <SheetClose asChild key={href+name}>
-                        <Link
-                          href={href}
-                          className="px-3 py-2 rounded-md transition-colors hover:bg-accent text-muted-foreground"
-                        >
-                          {name}
-                        </Link>
-                      </SheetClose>
-                    ))}
+                    <div>
+                      {navLinks.map(({ href, label }) => (
+                        <SheetClose asChild key={href}>
+                          <Link
+                            href={href}
+                            className="px-3 py-2 rounded-md transition-colors hover:bg-white/10 text-white"
+                          >
+                            {label}
+                          </Link>
+                        </SheetClose>
+                      ))}
+                    </div>
                     <div className='pt-4'>
-                    {navLinks.map(({ href, label }) => (
-                      <SheetClose asChild key={href}>
-                        <Link
-                          href={href}
-                          className="px-3 py-2 rounded-md transition-colors hover:bg-accent"
-                        >
-                          {label}
+                      <SheetClose asChild>
+                        <Link href="/book" className="px-3 py-2 rounded-md transition-colors bg-white/10 text-white">
+                          Book Now
                         </Link>
                       </SheetClose>
-                    ))}
                     </div>
                     <div className='pt-4 flex gap-2'>
                       {!auth && (
                         <>
                           <SheetClose asChild>
-                            <Link href="/auth/signin" className="px-3 py-2 rounded-md transition-colors hover:bg-accent">Sign In</Link>
+                            <Link href="/auth/signin" className="px-3 py-2 rounded-md transition-colors hover:bg-white/10 text-white">Sign In</Link>
                           </SheetClose>
                           <SheetClose asChild>
-                            <Link href="/auth/signup" className="px-3 py-2 rounded-md transition-colors hover:bg-accent">Sign Up</Link>
+                            <Link href="/auth/signup" className="px-3 py-2 rounded-md transition-colors hover:bg-white/10 text-white">Sign Up</Link>
                           </SheetClose>
                         </>
                       )}
@@ -183,13 +152,13 @@ export default function Header() {
                         <>
                           {auth.isAdmin && (
                             <SheetClose asChild>
-                              <Link href="/admin/workers" className="px-3 py-2 rounded-md transition-colors hover:bg-accent">Admin</Link>
+                              <Link href="/admin/workers" className="px-3 py-2 rounded-md transition-colors hover:bg-white/10 text-white">Admin</Link>
                             </SheetClose>
                           )}
                           <SheetClose asChild>
-                            <Link href="/profile" className="px-3 py-2 rounded-md transition-colors hover:bg-accent">Profile</Link>
+                            <Link href="/profile" className="px-3 py-2 rounded-md transition-colors hover:bg-white/10 text-white">Profile</Link>
                           </SheetClose>
-                          <Button size="sm" onClick={signOut}>Sign Out</Button>
+                          <Button variant="outline" size="sm" onClick={signOut} className="border-white text-white hover:bg-transparent">Sign Out</Button>
                         </>
                       )}
                     </div>

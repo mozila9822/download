@@ -24,6 +24,7 @@ export type Booking = {
   numberOfTravelers: number;
   totalPrice: number;
   paymentStatus: string;
+  extras?: any;
 };
 
 export type AdminStat = {
@@ -76,6 +77,8 @@ export type ThemeSettings = {
   primaryColor: string;
   secondaryColor: string;
   fontFamily: string;
+  heroImages?: Array<{ url: string; hint?: string; alt?: string }>;
+  galleryImages?: Array<{ url: string; caption?: string }>;
 };
 
 export type SiteSettingsDto = {

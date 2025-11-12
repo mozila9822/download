@@ -200,7 +200,7 @@ export default function WorkersPage() {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar>
-                          <AvatarImage src={`https://i.pravatar.cc/40?u=${worker.id}`} />
+                          <AvatarImage src={`https://picsum.photos/seed/worker-${worker.id}/40/40`} />
                           <AvatarFallback>{worker.firstName?.charAt(0)}{worker.lastName?.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div>

@@ -250,7 +250,7 @@ export default function ClientsPage() {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar>
-                          <AvatarImage src={`https://i.pravatar.cc/40?u=${client.id}`} />
+                          <AvatarImage src={`https://picsum.photos/seed/client-${client.id}/40/40`} />
                           <AvatarFallback>{client.firstName?.charAt(0)}{client.lastName?.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div>

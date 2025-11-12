@@ -1,27 +1,13 @@
-'use client';
-import React, { useState } from 'react';
+"use client";
+import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { MapPin } from 'lucide-react';
 import type { Service } from '@/lib/types';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 type ServiceCardProps = {
   service: Service;
@@ -29,72 +15,48 @@ type ServiceCardProps = {
 
 export default function ServiceCard({ service }: ServiceCardProps) {
   const hasOffer = service.offerPrice && service.offerPrice < service.price;
-  const [isOpen, setIsOpen] = useState(false);
-  const [travelDate, setTravelDate] = useState('');
-  const [travelers, setTravelers] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
-
-  const basePrice = hasOffer ? service.offerPrice! : service.price;
-  const totalPrice = basePrice * (Number.isFinite(travelers) ? travelers : 1);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!travelDate || !travelers || travelers < 1) {
-      toast({ variant: 'destructive', title: 'Invalid details', description: 'Please provide travel date and travelers.' });
-      return;
-    }
-    setIsSubmitting(true);
-    try {
-      const res = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          serviceId: service.id,
-          travelDate,
-          numberOfTravelers: travelers,
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data?.ok) {
-        const msg = data?.error || 'Failed to create booking.';
-        toast({ variant: 'destructive', title: 'Error', description: msg });
-        return;
-      }
-      toast({ title: 'Booked!', description: 'Your booking has been created.' });
-      setIsOpen(false);
-      setTravelDate('');
-      setTravelers(1);
-    } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Error', description: err?.message || 'Something went wrong.' });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const fallbackImage =
+    PlaceHolderImages.find((img) => img.id === 'tour-safari')?.imageUrl ||
+    'https://picsum.photos/seed/service-card-fallback/1200/800';
+  const imageSrc = service.imageUrl || fallbackImage;
+  const todayIso = new Date().toISOString().split('T')[0]
+  const withinWindow = (() => {
+    const s = service.startDate ? new Date(service.startDate) : null
+    const e = service.endDate ? new Date(service.endDate as any) : null
+    const t = new Date(todayIso)
+    if (s && t < s) return false
+    if (e && t > e) return false
+    return true
+  })()
+  const isAvail = (service.available ?? true) && withinWindow
 
   return (
     <>
-    <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group">
+    <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 group rounded-xl border border-white/10 bg-black/30 backdrop-blur">
       <CardHeader className="p-0 relative">
         <div className="relative aspect-video">
           <Image
-            src={service.imageUrl}
+            src={imageSrc}
             alt={service.title}
             fill
-            className="object-cover"
+            className="object-cover object-center"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition" />
         </div>
+        <Badge variant={isAvail ? "default" : "destructive"} className="absolute top-3 left-3 text-xs rounded-full px-2 py-1">
+          {isAvail ? 'Available' : 'Unavailable'}
+        </Badge>
         {hasOffer && (
-          <Badge variant="destructive" className="absolute top-3 right-3 text-base">
+          <Badge variant="destructive" className="absolute top-3 right-3 text-xs rounded-full px-2 py-1">
             DEAL!
           </Badge>
         )}
       </CardHeader>
-      <CardContent className="flex-1 pt-6">
-        <CardTitle className="font-headline text-xl leading-snug group-hover:text-primary transition-colors">
+      <CardContent className="flex-1 pt-4">
+        <CardTitle className="font-headline text-lg leading-snug group-hover:text-primary transition-colors">
           {service.title}
         </CardTitle>
-        <div className="mt-2 flex items-center text-sm text-muted-foreground">
+        <div className="mt-1 flex items-center text-xs text-white/80">
           <MapPin className="w-4 h-4 mr-1.5" />
           <span>{service.location}</span>
         </div>
@@ -103,44 +65,27 @@ export default function ServiceCard({ service }: ServiceCardProps) {
         <div className='flex flex-col items-start'>
             {hasOffer ? (
                 <>
-                    <p className="text-sm text-muted-foreground line-through">
-                        ${service.price.toLocaleString()}
+                    <p className="text-xs text-white/70 line-through">
+                        £{service.price.toLocaleString()}
                     </p>
-                    <p className="text-lg font-bold text-destructive">
-                        ${service.offerPrice?.toLocaleString()}
+                    <p className="text-lg font-bold text-accent">
+                        £{service.offerPrice?.toLocaleString()}
                     </p>
                 </>
             ) : (
                 <p className="text-lg font-bold text-primary">
-                    ${service.price.toLocaleString()}
+                    £{service.price.toLocaleString()}
                 </p>
             )}
         </div>
-        <Button onClick={() => setIsOpen(true)}>Book Now</Button>
+        <Button asChild className="rounded-lg">
+          <Link href={`/book?serviceId=${encodeURIComponent(service.id)}`}>
+            Book & Pay
+          </Link>
+        </Button>
       </CardFooter>
     </Card>
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Book: {service.title}</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="travel-date">Travel Date</Label>
-            <Input id="travel-date" type="date" value={travelDate} onChange={(e) => setTravelDate(e.target.value)} required />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="travelers">Number of Travelers</Label>
-            <Input id="travelers" type="number" min={1} value={travelers} onChange={(e) => setTravelers(Math.max(1, Number.parseInt(e.target.value || '1', 10)))} required />
-          </div>
-          <div className="text-sm text-muted-foreground">Total: ${totalPrice.toLocaleString()}</div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setIsOpen(false)} disabled={isSubmitting}>Cancel</Button>
-            <Button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Booking…' : 'Confirm Booking'}</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+    
     </>
   );
 }

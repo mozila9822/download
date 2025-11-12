@@ -3,6 +3,8 @@
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+// Import global styles used across admin pages (e.g., dashboard calendar)
+// Admin layout no longer imports global CSS; styles are loaded in root layout
 import {
   Bell,
   Building2,
@@ -17,6 +19,7 @@ import {
   Wrench,
   BarChart,
   LogOut,
+  Database,
 } from 'lucide-react';
 import {
   SidebarProvider,
@@ -40,13 +43,17 @@ const navItems = [
   { href: '/admin/calendar', icon: Calendar, label: 'Calendar' },
   { href: '/admin/rooms', icon: Building2, label: 'Rooms & Properties' },
   { href: '/admin/clients', icon: Contact, label: 'Clients / Companies' },
+  { href: '/admin/services', icon: Package2, label: 'Services' },
+  { href: '/admin/city-breaks', icon: Package2, label: 'City Breaks' },
   { href: '/admin/workers', icon: HardHat, label: 'Workers / Staff' },
   { href: '/admin/reports', icon: BarChart, label: 'Reports & Analytics' },
   { href: '/admin/operations', icon: Wrench, label: 'Operations' },
+  { href: '/admin/pricing', icon: BarChart, label: 'Pricing Rules' },
 ];
 
 const secondaryNavItems = [
     { href: '/admin/settings', icon: Settings, label: 'Settings' },
+    { href: '/admin/db-status', icon: Database, label: 'Database Status' },
     { href: '/admin/support', icon: HelpCircle, label: 'Help & Support' },
 ]
 
@@ -161,6 +168,7 @@ function AdminApp({ children }: { children: ReactNode }) {
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
+        {/* Admin pages rely on Next.js session (MySQL/Prisma) for permissions */}
         <AdminHeader />
         <main className="flex-1 p-4 md:p-6 lg:p-8 bg-gray-100 dark:bg-gray-900">{children}</main>
       </SidebarInset>

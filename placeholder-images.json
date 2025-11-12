@@ -3,49 +3,49 @@
     {
       "id": "hero-travel",
       "description": "A stunning view of a mountain range with a lake at sunset, representing adventure and travel.",
-      "imageUrl": "https://images.unsplash.com/photo-1604440095301-4ec2f9230155?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxtb3VudGFpbiUyMGxha2V8ZW58MHx8fHwxNzYxNTIwMTQ0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://picsum.photos/seed/hero-travel-mountain-lake/1080/720",
       "imageHint": "mountain lake"
     },
     {
       "id": "city-break-paris",
       "description": "The Eiffel Tower in Paris, representing a classic city break.",
-      "imageUrl": "https://images.unsplash.com/photo-1609971757431-439cf7b4141b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxFaWZmZWwlMjBUb3dlcnxlbnwwfHx8fDE3NjE1MjAxNDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://picsum.photos/seed/city-break-paris-eiffel/1080/720",
       "imageHint": "Eiffel Tower"
     },
     {
       "id": "tour-machu-picchu",
       "description": "The ancient ruins of Machu Picchu in Peru, representing an adventurous tour.",
-      "imageUrl": "https://images.unsplash.com/photo-1587595742138-7975cf837028?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxNYWNodSUyMFBpY2NodXxlbnwwfHx8fDE3NjE1MjAxNDR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://picsum.photos/seed/tour-machu-picchu/1080/720",
       "imageHint": "Machu Picchu"
     },
     {
       "id": "hotel-maldives",
       "description": "An overwater bungalow in the Maldives, representing a luxury hotel stay.",
-      "imageUrl": "https://images.unsplash.com/photo-1662792721650-545a15f07ff6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxNYWxkaXZlcyUyMGJ1bmdhbG93fGVufDB8fHx8MTc2MTUyMDE0NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://picsum.photos/seed/hotel-maldives-bungalow/1080/720",
       "imageHint": "Maldives bungalow"
     },
     {
       "id": "flight-window",
       "description": "View of clouds and a wing from an airplane window, representing flights.",
-      "imageUrl": "https://images.unsplash.com/photo-1603277103691-756354934c2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxhaXJwbGFuZSUyMHdpbmRvd3xlbnwwfHx8fDE3NjE0ODc1OTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://picsum.photos/seed/flight-window/1080/720",
       "imageHint": "airplane window"
     },
     {
       "id": "coach-ride-mountains",
       "description": "A scenic road through the mountains, representing a coach ride.",
-      "imageUrl": "https://images.unsplash.com/photo-1530296688540-3a317e00379d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxtb3VudGFpbiUyMHJvYWR8ZW58MHx8fHwxNzYxNDU2NDMyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://picsum.photos/seed/coach-ride-mountains/1080/720",
       "imageHint": "mountain road"
     },
     {
       "id": "city-break-tokyo",
       "description": "A bustling street in Tokyo at night, representing a modern city break.",
-      "imageUrl": "https://images.unsplash.com/photo-1604928141064-207cea6f571f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxUb2t5byUyMG5pZ2h0fGVufDB8fHx8MTc2MTUwMDYwOXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://picsum.photos/seed/city-break-tokyo-night/1080/720",
       "imageHint": "Tokyo night"
     },
     {
       "id": "tour-safari",
       "description": "Elephants on a safari in Africa, representing a wildlife tour.",
-      "imageUrl": "https://images.unsplash.com/photo-1611519183412-4db57afd1ab1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxzYWZhcmklMjBlbGVwaGFudHN8ZW58MHx8fHwxNzYxNTIwMTQ0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://picsum.photos/seed/tour-safari-elephants/1080/720",
       "imageHint": "safari elephants"
     }
   ]

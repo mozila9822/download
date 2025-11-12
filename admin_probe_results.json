@@ -1,0 +1,54 @@
+﻿[
+    {
+        "path":  "/admin",
+        "status":  500
+    },
+    {
+        "path":  "/admin/dashboard",
+        "status":  500
+    },
+    {
+        "path":  "/admin/bookings",
+        "status":  500
+    },
+    {
+        "path":  "/admin/calendar",
+        "status":  500
+    },
+    {
+        "path":  "/admin/rooms",
+        "status":  500
+    },
+    {
+        "path":  "/admin/clients",
+        "status":  500
+    },
+    {
+        "path":  "/admin/city-breaks",
+        "status":  500
+    },
+    {
+        "path":  "/admin/workers",
+        "status":  500
+    },
+    {
+        "path":  "/admin/reports",
+        "status":  500
+    },
+    {
+        "path":  "/admin/operations",
+        "status":  500
+    },
+    {
+        "path":  "/admin/settings",
+        "status":  500
+    },
+    {
+        "path":  "/admin/db-status",
+        "status":  200
+    },
+    {
+        "path":  "/admin/support",
+        "status":  200
+    }
+]

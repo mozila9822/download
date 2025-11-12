@@ -1,18 +1,19 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Plane, Hotel, Map, Bus, Bot, Zap, Globe, Headphones, Search, Calendar, CreditCard, MapPin } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ArrowRight, Plane, Hotel, Map, Bus, Bot, Zap, Globe, Headphones, Search, Calendar, CreditCard, MapPin, ShieldCheck, BadgeCheck, Lock } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useSettings } from '@/hooks/use-settings';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import SiteLayout from '@/components/site/SiteLayout';
 import ServiceCard from '@/components/site/ServiceCard';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '@/components/ui/carousel';
 import { services as allServices } from '@/lib/data';
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, where, limit } from 'firebase/firestore';
+import type { Service } from '@/lib/types';
+import { useEffect, useState } from 'react';
 
 const serviceIcons = [
   {
@@ -62,35 +63,73 @@ const heroImage = PlaceHolderImages.find(
 };
 
 export default function HomePage() {
-   const firestore = useFirestore();
+  const [lastMinuteOffers, setLastMinuteOffers] = useState<Service[] | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [heroApi, setHeroApi] = useState<CarouselApi | null>(null);
+  const { settings } = useSettings();
+  const { scrollYProgress } = useScroll();
+  const parallaxY = useTransform(scrollYProgress, [0, 1], [0, 60]);
 
-  const servicesQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'services'), where('offerPrice', '!=', null), limit(3));
-  }, [firestore]);
+  useEffect(() => {
+    let cancelled = false;
+    async function loadOffers() {
+      try {
+        setIsLoading(true);
+        const res = await fetch('/api/services?offerOnly=true&limit=3');
+        if (!res.ok) throw new Error('Failed to load offers');
+        const data: Service[] = await res.json();
+        if (!cancelled) setLastMinuteOffers(data);
+      } catch {
+        if (!cancelled) setLastMinuteOffers((allServices || []).filter(s => !!s.offerPrice).slice(0, 3));
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
+    loadOffers();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-  const { data: lastMinuteOffers, isLoading } = useCollection<any>(servicesQuery);
+  useEffect(() => {
+    if (!heroApi) return;
+    const id = setInterval(() => {
+      heroApi.scrollNext();
+    }, 5000);
+    return () => clearInterval(id);
+  }, [heroApi]);
 
   const featuredServices = (allServices || []).slice(0, 6);
 
   return (
     <SiteLayout>
       <main className="flex-1">
-        {/* Hero Section */}
         <section className="relative w-full h-[60vh] md:h-[80vh] flex items-center justify-center text-center text-white" aria-label="Hero">
-          <Image
-            src={heroImage.imageUrl}
-            alt={heroImage.description}
-            fill
-            className="object-cover -z-10 brightness-50"
-            priority
-            data-ai-hint={heroImage.imageHint}
-          />
-          {/* Subtle globe animation overlay */}
+          <Carousel className="absolute inset-0 -z-10" opts={{ loop: true }} setApi={setHeroApi}>
+            <CarouselContent>
+              {(settings?.theme?.heroImages && settings.theme.heroImages.length > 0
+                ? settings.theme.heroImages
+                : [
+                    { url: 'https://picsum.photos/seed/hero-travel-mountain-lake/1080/720', hint: 'mountain lake', alt: 'A stunning mountain lake at sunset' },
+                    { url: 'https://picsum.photos/seed/hero-travel-tropical-beach/1080/720', hint: 'tropical beach', alt: 'A serene tropical beach with palm trees' },
+                    { url: 'https://picsum.photos/seed/hero-travel-city-night/1080/720', hint: 'city night skyline', alt: 'City skyline at night with lights' },
+                    { url: 'https://picsum.photos/seed/hero-travel-desert-dunes/1080/720', hint: 'desert dunes', alt: 'Golden desert dunes under blue sky' },
+                  ]
+              ).map((img, i) => (
+                <CarouselItem key={i} className="basis-full">
+                  <div className="relative w-full h-[60vh] md:h-[80vh]">
+                    <Image src={img.url} alt={img.alt || ''} fill className="object-cover brightness-50" priority={i === 0} data-ai-hint={img.hint || ''} />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+          {/* Subtle globe animation overlay with parallax */}
           <motion.svg
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.25, rotate: 360 }}
             transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+            style={{ y: parallaxY }}
             viewBox="0 0 200 200"
             className="absolute w-[70%] md:w-[50%] max-w-[800px] h-auto"
             aria-hidden="true"
@@ -113,16 +152,20 @@ export default function HomePage() {
           </motion.svg>
           <div className="container px-4 md:px-6 animate-fade-in-up">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-headline font-bold tracking-tight">
-              Your Adventure Awaits
+              Plan Your Journey
             </h1>
             <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-neutral-200">
-              Discover and book your next journey with VoyagerHub. Unforgettable
-              experiences are just a click away.
+              Curated destinations, luxury stays, and seamless bookings — all in one place.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="font-bold">
                 <Link href="/services">
                   Explore Services <ArrowRight className="ml-2" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" className="font-bold" variant="secondary">
+                <Link href="/book">
+                  Plan & Book Now <ArrowRight className="ml-2" />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="font-bold">
@@ -305,6 +348,34 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Why Choose Voyager Hub */}
+        <section className="py-16 md:py-24 bg-background" aria-label="Why Choose Voyager Hub">
+          <div className="container px-4 md:px-6">
+            <div className="text-center">
+              <h2 className="text-3xl md:text-4xl font-headline font-bold">Why Choose Voyager Hub</h2>
+              <p className="mt-4 max-w-2xl mx-auto text-muted-foreground md:text-lg">Trusted credentials, secure payments, and tailor-made luxury.</p>
+            </div>
+            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <Card className="h-full">
+                <CardHeader className="flex items-center gap-3"><ShieldCheck className="w-6 h-6" /><CardTitle className="font-headline text-lg">ATOL Protected</CardTitle></CardHeader>
+                <CardContent><p className="text-muted-foreground">Your holiday is protected under UK travel regulations.</p></CardContent>
+              </Card>
+              <Card className="h-full">
+                <CardHeader className="flex items-center gap-3"><BadgeCheck className="w-6 h-6" /><CardTitle className="font-headline text-lg">ABTA Member</CardTitle></CardHeader>
+                <CardContent><p className="text-muted-foreground">Industry-standard assurance and service quality.</p></CardContent>
+              </Card>
+              <Card className="h-full">
+                <CardHeader className="flex items-center gap-3"><Lock className="w-6 h-6" /><CardTitle className="font-headline text-lg">Secure Payments</CardTitle></CardHeader>
+                <CardContent><p className="text-muted-foreground">Pay with confidence via leading gateways.</p></CardContent>
+              </Card>
+              <Card className="h-full">
+                <CardHeader className="flex items-center gap-3"><Map className="w-6 h-6" /><CardTitle className="font-headline text-lg">Tailored Luxury</CardTitle></CardHeader>
+                <CardContent><p className="text-muted-foreground">Personalised itineraries curated by experts.</p></CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
         {/* Testimonials */}
         <section className="py-16 md:py-24 bg-background" aria-label="Testimonials">
           <div className="container px-4 md:px-6">
@@ -365,3 +436,35 @@ export default function HomePage() {
     </SiteLayout>
   );
 }
+        {/* Quick Access */}
+        <section className="py-12 md:py-20 bg-background" aria-label="Quick Access">
+          <div className="container px-4 md:px-6">
+            <div className="text-center">
+              <h2 className="text-3xl md:text-4xl font-headline font-bold">Explore</h2>
+              <p className="mt-2 max-w-2xl mx-auto text-muted-foreground">Jump straight to our most popular sections.</p>
+            </div>
+            <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              <Card className="transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+                <CardHeader><CardTitle className="font-headline">Destinations</CardTitle></CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Browse countries, regions and curated guides.</p>
+                  <Button asChild variant="link" className="mt-3 font-bold"><Link href="/destinations">View Destinations <ArrowRight className="ml-1" /></Link></Button>
+                </CardContent>
+              </Card>
+              <Card className="transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+                <CardHeader><CardTitle className="font-headline">Accommodation</CardTitle></CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Luxury stays with flexible filters and live availability.</p>
+                  <Button asChild variant="link" className="mt-3 font-bold"><Link href="/accommodation">View Accommodation <ArrowRight className="ml-1" /></Link></Button>
+                </CardContent>
+              </Card>
+              <Card className="transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+                <CardHeader><CardTitle className="font-headline">Experiences</CardTitle></CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Luxury escapes, adventure tours and city breaks.</p>
+                  <Button asChild variant="link" className="mt-3 font-bold"><Link href="/experiences">View Experiences <ArrowRight className="ml-1" /></Link></Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>

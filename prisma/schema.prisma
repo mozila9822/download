@@ -1,10 +1,159 @@
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  engineType = "binary"
 }
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id                     Int              @id @default(autoincrement())
+  email                  String           @unique
+  name                   String?
+  phone                  String?
+  address                String?
+  role                   Role             @default(User)
+  passwordHash           String?
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+  bookings               Booking[]
+  payments               Payment[]
+  adminMessages          SupportMessage[] @relation("MessageAdmin")
+  userMessages           SupportMessage[] @relation("MessageUser")
+  assignedSupportThreads SupportThread[]  @relation("ThreadAssignedAdmin")
+  supportThreads         SupportThread[]  @relation("ThreadUser")
+}
+
+model Service {
+  id          String          @id @default(cuid())
+  category    ServiceCategory
+  title       String
+  description String
+  price       Float
+  offerPrice  Float?
+  location    String
+  imageUrl    String          @db.Text
+  createdAt   DateTime        @default(now())
+  status      ServiceStatus   @default(Active)
+  available   Boolean         @default(true)
+  startDate   DateTime?
+  endDate     DateTime?
+  isOffer     Boolean         @default(false)
+  bookings    Booking[]
+  availability Availability[]
+  pricingRules PricingRule[]
+}
+
+model Booking {
+  id                String    @id @default(cuid())
+  userId            Int
+  serviceId         String
+  bookingDate       DateTime
+  travelDate        DateTime
+  numberOfTravelers Int
+  totalPrice        Float
+  paymentStatus     String
+  status            String    @default("PendingPayment")
+  contactEmail      String?
+  contactPhone      String?
+  contactName       String?
+  notes             String?
+  travelers         Json?
+  currency          String?   @default("usd")
+  createdAt         DateTime  @default(now())
+  extras            Json?
+  service           Service   @relation(fields: [serviceId], references: [id])
+  user              User      @relation(fields: [userId], references: [id])
+  payments          Payment[]
+
+  @@index([serviceId], map: "Booking_serviceId_fkey")
+  @@index([userId], map: "Booking_userId_fkey")
+}
+
+model Payment {
+  id           String   @id @default(cuid())
+  bookingId    String
+  userId       Int
+  provider     String
+  intentId     String?
+  clientSecret String?
+  status       String
+  amount       Int
+  currency     String   @default("usd")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  booking      Booking  @relation(fields: [bookingId], references: [id])
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@index([bookingId], map: "Payment_bookingId_fkey")
+  @@index([userId], map: "Payment_userId_fkey")
+}
+
+model SiteSettings {
+  id             String                @id @default(cuid())
+  siteTitle      String                @default("VoyagerHub")
+  domains        Json?
+  logoUrl        String?
+  faviconUrl     String?
+  footer         Json?
+  navigation     Json?
+  sections       Json?
+  theme          Json?
+  seoTitle       String?
+  seoDescription String?
+  seoKeywords    String?
+  version        Int                   @default(1)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  histories      SiteSettingsHistory[]
+}
+
+model SiteSettingsHistory {
+  id         String       @id @default(cuid())
+  settingsId String
+  version    Int
+  data       Json
+  createdAt  DateTime     @default(now())
+  settings   SiteSettings @relation(fields: [settingsId], references: [id])
+
+  @@index([settingsId], map: "SiteSettingsHistory_settingsId_fkey")
+}
+
+model SupportThread {
+  id              String           @id @default(cuid())
+  userId          Int
+  assignedAdminId Int?
+  subject         String?
+  status          SupportStatus    @default(Open)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  messages        SupportMessage[]
+  assignedAdmin   User?            @relation("ThreadAssignedAdmin", fields: [assignedAdminId], references: [id])
+  user            User             @relation("ThreadUser", fields: [userId], references: [id])
+
+  @@index([assignedAdminId], map: "SupportThread_assignedAdminId_fkey")
+  @@index([userId], map: "SupportThread_userId_fkey")
+}
+
+model SupportMessage {
+  id          String        @id @default(cuid())
+  threadId    String
+  adminId     Int?
+  userId      Int?
+  messageText String        @db.Text
+  attachments Json?
+  readByUser  Boolean       @default(false)
+  readByAdmin Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  admin       User?         @relation("MessageAdmin", fields: [adminId], references: [id])
+  thread      SupportThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user        User?         @relation("MessageUser", fields: [userId], references: [id])
+
+  @@index([adminId], map: "SupportMessage_adminId_fkey")
+  @@index([threadId], map: "SupportMessage_threadId_fkey")
+  @@index([userId], map: "SupportMessage_userId_fkey")
 }
 
 enum Role {
@@ -27,7 +176,6 @@ enum ServiceStatus {
   Inactive
 }
 
-// Status for support threads
 enum SupportStatus {
   Open
   InProgress
@@ -36,114 +184,50 @@ enum SupportStatus {
   Urgent
 }
 
-model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  name         String?
-  phone        String?
-  address      String?
-  role         Role     @default(User)
-  passwordHash String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+model Availability {
+  id         String   @id @default(cuid())
+  serviceId  String
+  date       DateTime
+  capacity   Int      @default(1)
+  booked     Int      @default(0)
+  blocked    Boolean  @default(false)
+  priceOverride Float?
+  notes      String?
+  service    Service  @relation(fields: [serviceId], references: [id])
 
-  bookings     Booking[]
+  @@unique([serviceId, date], map: "Availability_service_date_unique")
+  @@index([serviceId], map: "Availability_serviceId_idx")
 }
 
-model Service {
+model PricingRule {
   id          String          @id @default(cuid())
-  category    ServiceCategory
-  title       String
-  description String
-  price       Float
-  offerPrice  Float?
-  location    String
-  imageUrl    String          @db.Text
-  createdAt   DateTime        @default(now())
-
-  // Operations/CRUD enhancements
-  status      ServiceStatus   @default(Active)
-  available   Boolean         @default(true)
+  serviceId   String?
+  category    ServiceCategory?
+  name        String
+  active      Boolean         @default(true)
   startDate   DateTime?
   endDate     DateTime?
-  isOffer     Boolean         @default(false)
+  weekendOnly Boolean         @default(false)
+  multiplier  Float?
+  fixedOverride Float?
+  priority    Int             @default(10)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  service     Service?        @relation(fields: [serviceId], references: [id])
 
-  bookings    Booking[]
+  @@index([serviceId], map: "PricingRule_serviceId_idx")
+  @@index([category], map: "PricingRule_category_idx")
+  @@index([active, startDate, endDate], map: "PricingRule_active_date_idx")
 }
 
-model Booking {
-  id                 String   @id @default(cuid())
-  userId             Int
-  user               User     @relation(fields: [userId], references: [id])
-  serviceId          String
-  service            Service  @relation(fields: [serviceId], references: [id])
-  bookingDate        DateTime
-  travelDate         DateTime
-  numberOfTravelers  Int
-  totalPrice         Float
-  paymentStatus      String
-  status             String   @default("Pending")
-  createdAt          DateTime @default(now())
-}
-
-// Global website settings for dynamic configuration
-model SiteSettings {
+model Destination {
   id             String   @id @default(cuid())
-  siteTitle      String   @default("VoyagerHub")
-  domains        Json?
-  logoUrl        String?
-  faviconUrl     String?
-  footer         Json?    // {contactEmail, contactPhone, address, disclaimer, social:{twitter,facebook,instagram,linkedin,youtube}}
-  navigation     Json?    // [{label, href, visible}]
-  sections       Json?    // [{name, href, visible}]
-  theme          Json?    // {primaryColor, secondaryColor, fontFamily}
-  seoTitle       String?
-  seoDescription String?
-  seoKeywords    String?
-  version        Int      @default(1)
+  slug           String   @unique
+  name           String
+  description    String?
+  gallery        Json?
+  attractions    Json?
+  featuredHotelIds Json?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
-
-  histories      SiteSettingsHistory[]
-}
-
-// History snapshots of settings for optional restore/versioning
-model SiteSettingsHistory {
-  id         String       @id @default(cuid())
-  settingsId String
-  settings   SiteSettings @relation(fields: [settingsId], references: [id])
-  version    Int
-  data       Json
-  createdAt  DateTime     @default(now())
-}
-
-// Conversation threads for Help & Support
-model SupportThread {
-  id               String        @id @default(cuid())
-  userId           Int
-  user             User          @relation(fields: [userId], references: [id])
-  assignedAdminId  Int?
-  assignedAdmin    User?         @relation(fields: [assignedAdminId], references: [id])
-  subject          String?
-  status           SupportStatus @default(Open)
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-
-  messages         SupportMessage[]
-}
-
-// Individual messages in a support thread
-model SupportMessage {
-  id           String        @id @default(cuid())
-  threadId     String
-  thread       SupportThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  adminId      Int?
-  admin        User?         @relation(fields: [adminId], references: [id])
-  userId       Int?
-  user         User?         @relation(fields: [userId], references: [id])
-  messageText  String        @db.Text
-  attachments  Json?
-  readByUser   Boolean       @default(false)
-  readByAdmin  Boolean       @default(false)
-  createdAt    DateTime      @default(now())
 }

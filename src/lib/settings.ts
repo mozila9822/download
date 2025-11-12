@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/db'
+import { prismaOrNull } from '@/lib/db'
 import type { PublicSettings, SiteSettingsPayload, SiteSettingsDto } from '@/lib/types'
 
 const defaultSettings: SiteSettingsDto = {
@@ -14,7 +14,14 @@ const defaultSettings: SiteSettingsDto = {
     social: { twitter: '', facebook: '', instagram: '', linkedin: '', youtube: '' },
   },
   navigation: [
-    { label: 'AI Itinerary', href: '/ai-itinerary', visible: true },
+    { label: 'Home', href: '/', visible: true },
+    { label: 'Destinations', href: '/destinations', visible: true },
+    { label: 'Accommodation', href: '/accommodation', visible: true },
+    { label: 'Experiences', href: '/experiences', visible: true },
+    { label: 'About', href: '/about', visible: true },
+    { label: 'Blog', href: '/blog', visible: true },
+    { label: 'Contact', href: '/contact', visible: true },
+    { label: 'Book Now', href: '/book', visible: true },
   ],
   sections: [
     { name: 'City Break', href: '/city-break', visible: true },
@@ -24,7 +31,7 @@ const defaultSettings: SiteSettingsDto = {
     { name: 'Coach Ride', href: '/coach-ride', visible: true },
     { name: 'Last Offers', href: '/offers', visible: true },
   ],
-  theme: { primaryColor: '#0ea5e9', secondaryColor: '#f59e0b', fontFamily: 'PT Sans' },
+  theme: { primaryColor: '#0D1B2A', secondaryColor: '#C5A15E', fontFamily: 'PT Sans' },
   seoTitle: 'VoyagerHub - Your Ultimate Travel Partner',
   seoDescription:
     'Explore and book city breaks, tours, hotels, and flights with VoyagerHub. Your adventure starts here.',
@@ -35,6 +42,7 @@ const defaultSettings: SiteSettingsDto = {
 
 export async function getSiteSettings(): Promise<SiteSettingsDto> {
   try {
+    const prisma = await prismaOrNull()
     if (!prisma) return defaultSettings
     const row = await prisma.siteSettings.findFirst({ orderBy: { updatedAt: 'desc' } })
     if (!row) {
@@ -45,13 +53,15 @@ export async function getSiteSettings(): Promise<SiteSettingsDto> {
         version: created.version,
       }
     }
+    const rowNav = (row.navigation as any) ?? defaultSettings.navigation
+    const navigation = Array.isArray(rowNav) && rowNav.length > 0 ? rowNav : (defaultSettings.navigation as any)
     return {
       siteTitle: row.siteTitle,
       domains: (row.domains as any) ?? [],
       logoUrl: row.logoUrl ?? null,
       faviconUrl: row.faviconUrl ?? null,
       footer: (row.footer as any) ?? defaultSettings.footer,
-      navigation: (row.navigation as any) ?? defaultSettings.navigation,
+      navigation,
       sections: (row.sections as any) ?? defaultSettings.sections,
       theme: (row.theme as any) ?? defaultSettings.theme,
       seoTitle: row.seoTitle ?? defaultSettings.seoTitle,
@@ -66,6 +76,7 @@ export async function getSiteSettings(): Promise<SiteSettingsDto> {
 }
 
 export async function updateSiteSettings(payload: SiteSettingsPayload): Promise<SiteSettingsDto> {
+  const prisma = await prismaOrNull()
   if (!prisma) return defaultSettings
   const current = await prisma.siteSettings.findFirst({ orderBy: { updatedAt: 'desc' } })
   let settingsId: string | null = current?.id ?? null
